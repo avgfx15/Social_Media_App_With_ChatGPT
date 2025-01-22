@@ -88,11 +88,11 @@ const getAllPosts = async (req, res) => {
 const updatePost = async (req, res) => {
   try {
     const { postId } = req.params;
-    const { content, media } = req.body;
+    const { title, subTitle, content, media } = req.body;
 
     const post = await Post.findOneAndUpdate(
       { _id: postId, author: req.user.id },
-      { content, media },
+      { title, subTitle, content, media },
       { new: true, runValidators: true }
     );
 
