@@ -942,3 +942,286 @@ following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 ```
 
 Let me know if you’d like a specific adjustment or further optimization!
+
+### **Create All POST related API**
+Below are the implementation details for Post APIs, starting with /api/posts for operations such as create, retrieve, update, delete, and search posts.
+
+We'll follow a layered architecture with controllers, routes, and repository methods to ensure modularity and maintainability.
+Route Definitions
+
+**Define routes in /routes/postRoutes.js:**
+```javascript
+
+const express = require('express');
+const postController = require('../controllers/postController');
+
+const router = express.Router();
+
+// Post routes
+router.post('/', postController.createPost);
+router.get('/:postId', postController.getPost);
+router.get('/', postController.getAllPosts); // For fetching with pagination
+router.patch('/:postId', postController.updatePost);
+router.delete('/:postId', postController.deletePost);
+router.get('/search', postController.searchPosts);
+
+module.exports = router;
+
+```
+
+### Controller Methods
+
+Controller methods are responsible for processing the request, invoking the appropriate repository logic, and sending responses.
+
+1. Create Post
+
+``` javascript
+const Post = require('../models/Post');
+
+exports.createPost = async (req, res) => {
+  try {
+    const { content, media } = req.body;
+    const author = req.user.id; // Assuming `req.user` is populated via middleware
+
+    if (!content) {
+      return res.status(400).json({ error: 'Content is required' });
+    }
+
+    const post = new Post({ content, media, author });
+    await post.save();
+    res.status(201).json({ message: 'Post created successfully', post });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+```
+
+2. Get a Single Post
+
+``` javascript
+
+exports.getPost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await Post.findById(postId).populate('author', 'username avatar').populate('comments');
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    res.status(200).json(post);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+```
+
+3. Get All Posts (with Pagination)
+
+``` javascript
+
+exports.getAllPosts = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query; // Pagination query params
+
+    const posts = await Post.find()
+      .populate('author', 'username avatar')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+```
+
+4. Update a Post
+
+``` javascript
+
+exports.updatePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { content, media } = req.body;
+
+    const post = await Post.findOneAndUpdate(
+      { _id: postId, author: req.user.id },
+      { content, media },
+      { new: true, runValidators: true }
+    );
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found or unauthorized' });
+    }
+
+    res.status(200).json({ message: 'Post updated successfully', post });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+```
+
+5. Delete a Post
+
+```javascript
+
+exports.deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await Post.findOneAndDelete({ _id: postId, author: req.user.id });
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found or unauthorized' });
+    }
+
+    res.status(200).json({ message: 'Post deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+```
+
+6. Search Posts
+
+```javascript
+
+exports.searchPosts = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ error: 'Search query is required' });
+    }
+
+    const posts = await Post.find({ content: { $regex: query, $options: 'i' } })
+      .populate('author', 'username avatar')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+```
+
+### Repository Layer (Optional)
+
+Use a repository layer to centralize database logic in /repositories/postRepository.js:
+
+```javascript
+const Post = require('../models/Post');
+
+// Create a post
+exports.createPost = (postData) => new Post(postData).save();
+
+// Get post by ID with populates
+exports.getPostById = (postId) => Post.findById(postId).populate('author comments');
+
+// Get all posts with pagination
+exports.getAllPosts = (page, limit) =>
+  Post.find()
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(Number(limit))
+    .populate('author comments');
+
+// Update a post
+exports.updatePost = (postId, authorId, updateData) =>
+  Post.findOneAndUpdate(
+    { _id: postId, author: authorId },
+    updateData,
+    { new: true, runValidators: true }
+  );
+
+// Delete a post
+exports.deletePost = (postId, authorId) =>
+  Post.findOneAndDelete({ _id: postId, author: authorId });
+
+// Search posts
+exports.searchPosts = (query) =>
+  Post.find({ content: { $regex: query, $options: 'i' } }).populate('author comments');
+
+```
+### Service Layer (Optional)
+Use a service layer to encapsulate business logic in /services/postService.js:
+
+``` javascript
+const PostRepository = require('../repositories/postRepository');
+const CommentRepository = require('../repositories/commentRepository');
+const AuthorRepository = require('../repositories/authorRepository');
+const { validatePost } = require('../utils/validation');
+const { createComment } = require('../services/commentService');
+const { createAuthor } = require('../services/authorService');
+const { createPost } = require('../repositories/postRepository');
+const { updatePost } = require('../repositories/postRepository');
+const { deletePost } = require('../repositories/postRepository');
+const { searchPosts } = require('../repositories/postRepository');
+const { getPostById } = require('../repositories/postRepository');
+const { getAllPosts } = require('../repositories/postRepository');
+const { updatePost } = require('../repositories/postRepository');
+// Create a post
+exports.createPost = async (postData) => {
+  const author = await createAuthor(postData.author);
+  const post = await createPost({ ...postData, author });
+  return post;
+  };
+  // Get a post by ID
+  exports.getPostById = async (postId) => {
+    const post = await getPostById(postId);
+    return post;
+    };
+    // Get all posts
+    exports.getAllPosts = async (limit, page) => {
+      const posts = await getAllPosts(limit, page);
+      return posts;
+      };
+      // Update a post
+      exports.updatePost = async (postId, authorId, updateData) => {
+        const post = await getPostById(postId);
+        if (post.author !== authorId) {
+          throw new Error('Unauthorized');
+          }
+          const updatedPost = await updatePost(postId, updateData);
+          return updatedPost;
+          };
+          // Delete a post
+          exports.deletePost = async (postId, authorId) => {
+            const post = await getPostById(postId);
+            if (post.author !== authorId) {
+              throw new Error('Unauthorized');
+              }
+              const deletedPost = await deletePost(postId);
+              return deletedPost;
+              };
+              // Search posts
+              exports.searchPosts = async (searchTerm) => {
+                const posts = await searchPosts(searchTerm);
+                return posts;
+              }
+
+
+              ```
+
+### Connecting Layers
+
+    Import Repositories in Controllers: Call repository methods from the controller to abstract database logic.
+    Routing: Add the postRoutes.js to your app.js:
+
+const postRoutes = require('./routes/postRoutes');
+app.use('/api/posts', postRoutes);
+
+Middleware: Ensure req.user is populated using authentication middleware before accessing routes that require user identification.
