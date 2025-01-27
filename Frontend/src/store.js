@@ -1,11 +1,16 @@
-import { configureStore } from "@reduxjs/toolkit";
-import authReducer from './features/authSlice';
-import forgotResetPasswordReducer from './features/forgotResetPasswordSlice';
+import { configureStore } from '@reduxjs/toolkit';
+
+import { postReducer } from './features/Post/PostSlice';
+import { mediaReducer } from './features/Media/MediaSlice';
+import { forgotResetPasswordReducer } from './features/Auth/forgotResetPasswordSlice';
+import { authReducer } from './features/Auth/authSlice';
 
 const store = configureStore({
   reducer: {
-    auth: authReducer,
-    forgotResetPassword: forgotResetPasswordReducer,
+    authReducer,
+    forgotResetPasswordReducer,
+    post: postReducer,
+    mediaReducer,
   },
 });
 

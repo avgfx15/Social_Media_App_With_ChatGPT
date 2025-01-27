@@ -14,23 +14,23 @@ const postSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
+    category: {
+      type: String,
+      required: [true, 'Category is required'],
+      trim: true,
+      unique: true,
+    },
     content: {
       type: String,
       required: [true, 'Content is required'],
-      maxlength: [500, 'Content cannot exceed 500 characters'],
+      // maxlength: [500, 'Content cannot exceed 500 characters'],
       trim: true,
     },
+
     media: {
-      type: String, // URL of media file (optional)
-      validate: {
-        validator: function (value) {
-          return /^(http(s)?:\/\/.*\.(?:png|jpg|jpeg|gif|webp|mp4|avi|mkv))$/.test(
-            value
-          );
-        },
-        message: 'Invalid media URL',
-      },
+      type: String,
     },
+
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

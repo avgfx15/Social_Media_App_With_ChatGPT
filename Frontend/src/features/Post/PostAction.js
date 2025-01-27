@@ -10,6 +10,9 @@ export const createPost = createAsyncThunk(
   'posts/create',
   async (postData, { rejectWithValue }) => {
     try {
+      console.log(postData.media);
+      console.log(postData);
+
       const response = await axios.post(
         `${API_BASE_URL}/api/posts/`,
         postData,
@@ -25,7 +28,19 @@ export const createPost = createAsyncThunk(
     } catch (error) {
       console.log(error.response?.data || error.message);
       return rejectWithValue(error.response?.data || error.message);
-      // return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// % Get all categories from post
+export const getCategories = createAsyncThunk(
+  'categories/getAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/posts/categories`);
+      return response.data;
+    } catch {
+      return rejectWithValue('Failed to fetch categories');
     }
   }
 );

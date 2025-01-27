@@ -8,6 +8,7 @@ const {
   updatePost,
   deletePost,
   searchPosts,
+  categories,
 } = require('../controllers/postControllers');
 const authenticateToken = require('../Middleware/authMiddleware');
 
@@ -18,5 +19,7 @@ postRoutes.get('/', getAllPosts); // For fetching with pagination
 postRoutes.patch('/:postId', authenticateToken, updatePost);
 postRoutes.delete('/:postId', authenticateToken, deletePost);
 postRoutes.get('/search', searchPosts);
+
+postRoutes.get('/categories', categories);
 
 module.exports = postRoutes;

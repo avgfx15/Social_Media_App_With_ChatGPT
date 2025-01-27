@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { signinUser } from '../features/authSlice';
+
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { signinUser } from '../features/Auth/authAction';
+import { loadingState, tokenState } from '../features/Auth/authSlice';
 
 const SignIn = () => {
   const navigate = useNavigate();
+
+  const isUserLoggedIn = useSelector(tokenState);
+  const loading = useSelector(loadingState);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
 
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,22 +29,11 @@ const SignIn = () => {
     }
 
     try {
-      if (!isCheckboxChecked) return; // Prevent login if checkbox is not checked.
+      if (isUserLoggedIn) return; // Prevent login if checkbox is not checked.
       // Call your Redux action or any API to perform signin
-      const response = await dispatch(signinUser({ email, password }));
-      console.log(response);
-      console.log(response?.payload);
+      await dispatch(signinUser({ email, password }));
 
-      // Assuming `signinUser` resolves with the server response
-      if (response?.payload?.token) {
-        // Adjust based on your API response
-        // If success, navigate to dashboard
-        toast.success('Login successful!');
-        navigate('/');
-      } else {
-        // Handle login failure
-        toast.error(response?.payload?.message || 'Login failed');
-      }
+      navigate('/');
     } catch (error) {
       console.error('Error during sign-in:', error);
       toast.error('Something went wrong, please try again.');
@@ -88,8 +82,8 @@ const SignIn = () => {
                 checked={isCheckboxChecked}
                 onChange={(e) => setIsCheckboxChecked(e.target.checked)}
               />
-              <label htmlFor='terms' className='ms-3'>
-                I agree to the terms and conditions
+              <label htmlFor='terms' className='m-3'>
+                I agree to Sign In
               </label>
             </div>
             <button

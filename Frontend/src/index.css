@@ -1,5 +1,84 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 @import 'flowbite';
+
+@import url('https://fonts.googleapis.com/css2?family=Arial:wght@400;700&family=Comic+Sans+MS&family=Courier+New:wght@400;700&family=Georgia:wght@400;700&family=Impact&family=Times+New+Roman:wght@400;700&family=Trebuchet+MS:wght@400;700&family=Verdana:wght@400;700&display=swap');
+
+* {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.light {
+  background-color: #e4b68b;
+  color: black;
+}
+
+.dark {
+  background-color: #081c46;
+  color: white;
+}
+
+.jodit-status-bar__item-right {
+  display: none;
+}
+
+/* Add styles for the new font-family */
+.ql-font-arial {
+  font-family: Arial, sans-serif;
+}
+
+.ql-font-comic-sans {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.ql-font-courier-new {
+  font-family: 'Courier New', monospace;
+}
+
+.ql-font-georgia {
+  font-family: Georgia, serif;
+}
+
+.ql-font-helvetica {
+  font-family: Helvetica, sans-serif;
+}
+
+.ql-font-lucida {
+  font-family: 'Lucida Grande', sans-serif;
+}
+
+.ql-font-verdana {
+  font-family: Verdana, sans-serif; /* New font-family */
+}
+
+.ql-font-firacode {
+  font-family: 'Fira Code', monospace;
+}
+.ql-font-times-new-roman {
+  font-family: 'Times New Roman', serif;
+}
+.ql-font-sans-serif {
+  font-family: 'sans-serif', sans-serif;
+}
+.ql-font-serif {
+  font-family: 'serif', serif;
+}
+.ql-font-monospace {
+  font-family: 'monospace', monospace;
+}
+
+.ql-font-open-sans {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.ql-font-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+.ql-font-pacifico {
+  font-family: 'Pacifico', cursive;
+}

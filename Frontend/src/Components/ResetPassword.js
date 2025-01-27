@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useLocation, useNavigate } from 'react-router-dom';
-import { resetPassword, resetState } from '../features/forgotResetPasswordSlice';
+import { resetPassword } from '../features/Auth/forgotResetPasswordAction';
+import { resetState } from '../features/Auth/forgotResetPasswordSlice';
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -38,20 +39,20 @@ const ResetPassword = () => {
       <h1>Reset Password</h1>
       <form onSubmit={handleSubmit}>
         <input
-          type="password"
-          placeholder="Enter new password"
+          type='password'
+          placeholder='Enter new password'
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           required
         />
         <input
-          type="password"
-          placeholder="Confirm new password"
+          type='password'
+          placeholder='Confirm new password'
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
-        <button type="submit" disabled={loading}>
+        <button type='submit' disabled={loading}>
           {loading ? 'Resetting...' : 'Reset Password'}
         </button>
       </form>

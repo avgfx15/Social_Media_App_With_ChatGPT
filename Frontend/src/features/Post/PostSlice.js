@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createPost } from './PostAction';
+import { createPost, getCategories } from './PostAction';
 
 const postSlice = createSlice({
   name: 'posts',
@@ -7,6 +7,7 @@ const postSlice = createSlice({
     allPosts: [],
     status: 'idle',
     error: null,
+    allCategories: [],
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -22,9 +23,23 @@ const postSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload;
       });
+
+    // % Get All Categories
+    builder
+      .addCase(getCategories.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getCategories.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.allCategories = action.payload;
+      })
+      .addCase(getCategories.rejected, (state, action) => {
+        state.status = 'failed';
+      });
   },
 });
-
-export default postSlice.reducer;
+export const postReducer = postSlice.reducer;
 
 export const selectAllPostsState = (state) => state.posts.allPosts;
+
+export const allCategoriesState = (state) => state.posts.allCategories;

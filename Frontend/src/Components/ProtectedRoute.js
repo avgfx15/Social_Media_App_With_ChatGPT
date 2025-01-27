@@ -1,36 +1,31 @@
-import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { validateToken } from "../features/auth";
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { Navigate } from 'react-router-dom';
 
+import { useDispatch } from 'react-redux';
+
+import { validateToken } from '../features/Auth/authAction';
 
 const ProtectedRoute = ({ children }) => {
-  const [isValid, setIsValid] = useState(null); // null = loading, true/false = token state
+  const dispatch = useDispatch();
+
+  const authToken = localStorage.getItem('token');
 
   useEffect(() => {
-    const checkToken = async () => {
-      const token = localStorage.getItem("token");
+    if (authToken) {
+      dispatch(validateToken(authToken));
+    }
+  }, [authToken, dispatch]);
 
-      if (!token) {
-        setIsValid(false); // No token, user must sign in
-        return;
-      }
-
-      const valid = await validateToken(token);
-      setIsValid(valid);
-    };
-
-    checkToken();
-  }, []);
-
-  if (isValid === null) {
-    return <div>Loading...</div>; // Loader while validating
+  if (!authToken) {
+    return <Navigate to='/signin' replace />; // Redirect unauthenticated users
   }
 
-  if (!isValid) {
-    return <Navigate to="/signin" replace />; // Redirect unauthenticated users
-  }
+  return children;
+};
 
-  return children; // Render protected content
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default ProtectedRoute;

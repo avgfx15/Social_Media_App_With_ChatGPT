@@ -44,7 +44,7 @@ const signup = async (req, res) => {
   }
 };
 
-// Controller for user sign-in
+// $ Controller for user sign-in
 const signin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -97,7 +97,6 @@ const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: 'Email not found' });
     }
 
-
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto
@@ -128,7 +127,6 @@ const forgotPassword = async (req, res) => {
       text: `Click this link to reset your password: ${resetLink}`,
     });
 
-
     res.status(200).json({ message: 'Password reset email sent.' });
   } catch (error) {
     console.error(error);
@@ -143,12 +141,10 @@ const resetPassword = async (req, res) => {
   try {
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-
     // Find user by reset token
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
     });
-
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired token' });

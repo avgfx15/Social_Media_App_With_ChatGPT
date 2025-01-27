@@ -1,89 +1,294 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useRef, useState } from 'react';
 
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // ReactQuill default theme
-import { FaImage, FaPaperPlane } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+
+import JoditEditor from 'jodit-react';
+import { config, joditConfig } from '../../joditConfig';
 import { createPost } from '../../features/Post/PostAction';
+import { uploadImage } from '../../features/Media/MediaAction';
+import { imageUrlState } from '../../features/Media/MediaSlice';
+import { allCategoriesState } from '../../features/Post/PostSlice';
 
 const CreatePostComponent = () => {
   const dispatch = useDispatch();
+
+  const allCategories = useSelector(allCategoriesState);
+
+  const [newCategory, setNewCategory] = useState('');
+  const [categories, setCategories] = useSelector(allCategories);
+
+  // # Jodit-react Set up
+  const editor1 = useRef(null);
+  const editor2 = useRef(null);
+
+  // # To Remove copyright POWERED BY JODIT
+  const editorRef = useRef(null);
+
+  const removePoweredBy = () => {
+    const editor = editorRef.current;
+    if (editor) {
+      const poweredBy = document.querySelector('.jodit-status-bar__item-right');
+      if (poweredBy) {
+        poweredBy.remove();
+      }
+    }
+  };
+
+  // % State For All Input Variable
   const [title, setTitle] = useState('');
   const [subTitle, setSubTitle] = useState('');
+  const [category, setCategory] = useState('');
   const [content, setContent] = useState('');
-  const [media, setMedia] = useState('');
 
-  const handleSubmit = () => {
-    if (!title || !subTitle || !content) {
-      alert('Title, subtitle, and content are required!');
+  const uploadImageUrl = useSelector(imageUrlState);
+
+  // % Handle Image Upload
+  const [file, setFile] = useState(null); // Store the selected file
+
+  // Handle file selection
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  // Handle file upload
+  const handleUpload = async () => {
+    if (!file) {
+      alert('Please select an image before uploading.');
       return;
     }
 
-    const postData = { title, subTitle, content, media };
-    dispatch(createPost(postData));
+    const formData = new FormData();
+    formData.append('image', file);
 
-    // Clear fields after submit
-    setTitle('');
-    setSubTitle('');
-    setContent('');
-    setMedia('');
+    dispatch(uploadImage(formData));
+  };
+
+  // % Handle Publish Post
+  const handlePublishPost = () => {
+    const post = {
+      title,
+      subTitle,
+      category,
+      content,
+      media: uploadImageUrl,
+    };
+
+    console.log('Publishing Post: ', post);
+
+    dispatch(createPost(post));
   };
 
   return (
-    <div className='bg-white shadow-md rounded-lg p-6 w-full max-w-3xl mx-auto space-y-6'>
-      <h1 className='text-2xl font-bold text-center text-gray-700'>
-        Create a Post
-      </h1>
+    <div className='flex flex-col flex-wrap lg:flex-row gap-6 px-8 py-4'>
+      {/* Input Fields Panel */}
+      <div className='w-full lg:w-1/2 border rounded-lg p-6 bg-gray-100 dark:bg-gray-800'>
+        <h2 className='text-2xl font-bold mb-4'>Create Post</h2>
 
-      <input
-        type='text'
-        className='w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-blue-400'
-        placeholder='Title'
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+        {/* Title */}
+        <div className='my-2 p-2 border-1 border-gray-500 rounded-md'>
+          <label
+            htmlFor='title'
+            className='block text-xl text-green-600 font-extrabold dark:text-green-400'
+          >
+            Title
+          </label>
+          <JoditEditor
+            ref={editor1}
+            config={config}
+            value={title}
+            onBlur={removePoweredBy} // Triggered when the editor loads
+            onChange={(newContent) => setTitle(newContent)} // Triggered when the user types something
+            className='text-gray-900'
+          />
+        </div>
+        {/* Subtitle */}
+        <div className='my-2 p-1 border-1 border-gray-500 rounded-md'>
+          <label
+            htmlFor='subTitle'
+            className='block text-xl text-green-600 font-extrabold dark:text-green-400'
+          >
+            Subtitle
+          </label>
+          <input
+            type='text'
+            id='subTitle'
+            value={subTitle}
+            onChange={(e) => setSubTitle(e.target.value)}
+            className='mt-1 mb-4 w-full border-gray-300 rounded-md text-gray-900'
+            placeholder='Enter the subtitle'
+          />
+        </div>
+        {/* Category */}
+        {/* <div className='my-2 p-2 border-1 border-gray-500 rounded-md'>
+          <label
+            htmlFor='category'
+            className='block text-xl text-green-600 font-extrabold dark:text-green-400'
+          >
+            Category
+          </label>
+          <select
+            id='category'
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className='mt-1 mb-4 w-full border-gray-300 rounded-md text-gray-900'
+          >
+            <option value=''>Select Category</option>
+            <option value='Technology'>Technology</option>
+            <option value='Health'>Health</option>
+            <option value='Lifestyle'>Lifestyle</option>
+          </select>
+        </div> */}
 
-      <input
-        type='text'
-        className='w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-blue-400'
-        placeholder='Subtitle'
-        value={subTitle}
-        onChange={(e) => setSubTitle(e.target.value)}
-      />
+        <div className='my-2 p-2 border border-gray-500 rounded-md'>
+          <label
+            htmlFor='category'
+            className='block text-xl text-green-600 font-extrabold dark:text-green-400'
+          >
+            Category
+          </label>
 
-      <ReactQuill
-        value={content}
-        onChange={setContent}
-        placeholder='Write your content here...'
-        className='bg-white h-52'
-        modules={{
-          toolbar: [
-            [{ font: [] }, { size: [] }],
-            [{ align: [] }],
-            ['bold', 'italic', 'underline'],
-            [{ color: [] }, { background: [] }],
-          ],
-        }}
-      />
+          {/* Select Dropdown for Categories */}
+          <select
+            id='category'
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className='mt-1 mb-4 w-full border-gray-300 rounded-md text-gray-900'
+          >
+            <option value=''>Select Category</option>
+            {categories.map((cat, index) => (
+              <option key={index} value={cat}>
+                {cat}
+              </option>
+            ))}
+            <option value='add-new'>Add New Category</option>
+          </select>
 
-      <div className='flex items-center gap-4'>
-        <input
-          type='url'
-          className='w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-blue-400'
-          placeholder='Image URL'
-          value={media}
-          onChange={(e) => setMedia(e.target.value)}
-        />
-        <FaImage className='text-blue-500' size={24} />
+          {/* Input for Adding New Category */}
+          {category === 'add-new' && (
+            <div className='mt-4'>
+              <label
+                htmlFor='newCategory'
+                className='block text-lg text-gray-600 dark:text-gray-400'
+              >
+                Add New Category
+              </label>
+              <input
+                type='text'
+                id='newCategory'
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                className='mt-1 w-full p-2 border border-gray-300 rounded-md text-gray-900'
+                placeholder='Enter new category'
+              />
+              <button
+                type='button'
+                onClick={() => {
+                  if (newCategory && !categories.includes(newCategory)) {
+                    setCategories([...categories, newCategory]);
+                    setCategory(newCategory);
+                    setNewCategory('');
+                  } else {
+                    alert('Category already exists or is invalid!');
+                  }
+                }}
+                className='mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700'
+              >
+                Add Category
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Content Editor */}
+        <div className='my-2 p-2 border-1 border-gray-500 rounded-md'>
+          <label
+            htmlFor='content'
+            className='block text-xl text-green-600 font-extrabold dark:text-green-400'
+          >
+            Content
+          </label>
+          <div className='border rounded-md'>
+            <JoditEditor
+              ref={editor2}
+              config={joditConfig}
+              value={content}
+              onBlur={(newContent) => setContent(newContent)}
+              className='text-gray-900'
+            />
+          </div>
+        </div>
+        {/* Media Upload */}
+        <div className='my-2 p-2 border-1 border-gray-500 rounded-md'>
+          <label
+            htmlFor='media'
+            className='block text-xl text-green-600 font-extrabold dark:text-green-400'
+          >
+            Upload Media
+          </label>
+          <input
+            type='file'
+            id='media'
+            accept='image/*'
+            onChange={handleFileChange}
+            className='mt-1 mb-4 text-gray-900'
+          />
+
+          <button
+            onClick={handleUpload}
+            className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+          >
+            Upload Image
+          </button>
+        </div>
+        {uploadImageUrl && (
+          <div className='mt-4'>
+            <p>Uploaded Image:</p>
+            <img
+              src={`./uploads/` + uploadImageUrl}
+              alt='Uploaded'
+              className='w-48 h-48 object-cover mt-2'
+            />
+          </div>
+        )}
+
+        {/* Submit Button */}
+        <button
+          onClick={handlePublishPost}
+          className='px-6 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600'
+        >
+          Publish Post
+        </button>
       </div>
 
-      <button
-        className='w-full py-3 px-6 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-md flex items-center justify-center gap-2'
-        onClick={handleSubmit}
-      >
-        <FaPaperPlane size={20} />
-        Post
-      </button>
+      {/* Preview Panel */}
+      <div className='w-full lg:w-1/2 border rounded-lg p-6 bg-gray-50 dark:bg-gray-700'>
+        <h2 className='text-2xl font-bold mb-4'>Post Preview</h2>
+        {/* Post Title */}
+        <h3 className='text-lg font-bold'>{title || 'Post Title'}</h3>
+        {/* Post Subtitle */}
+        <p className='text-gray-700 dark:text-gray-300'>
+          {subTitle || 'Subtitle goes here...'}
+        </p>
+        {/* Post Category */}
+        <p className='text-sm text-gray-600 dark:text-gray-400 italic'>
+          {category || 'Category'}
+        </p>
+        {/* Post Media */}
+        {uploadImageUrl && (
+          <img
+            src={`./uploads/` + uploadImageUrl}
+            alt='Uploaded Media'
+            className='mt-4 rounded-md'
+          />
+        )}
+        {/* Post Content */}
+        <div
+          className='prose dark:prose-dark'
+          dangerouslySetInnerHTML={{
+            __html: content || 'Post content will appear here...',
+          }}
+        ></div>
+      </div>
     </div>
   );
 };

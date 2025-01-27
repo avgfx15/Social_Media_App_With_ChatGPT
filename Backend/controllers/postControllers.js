@@ -4,11 +4,12 @@ const Comment = require('../Models/commentSchema');
 // + Create Post
 const createPost = async (req, res) => {
   try {
-    const { title, subTitle, content, media } = req.body;
+    const { title, subTitle, category, content, media } = req.body;
     const author = req.user.id; // Assuming `req.user` is populated via middleware
+    console.log(req.body);
 
     // Validate required fields
-    if (!title || !subTitle || !content) {
+    if (!title || !subTitle || !category || !content) {
       return res.status(400).json({
         error: 'Title, SubTitle, and Content are required',
       });
@@ -23,7 +24,14 @@ const createPost = async (req, res) => {
     }
 
     // Create the post
-    const post = new Post({ title, subTitle, content, media, author });
+    const post = new Post({
+      title,
+      subTitle,
+      category,
+      content,
+      media,
+      author,
+    });
 
     // Attempt to save the post
     await post.save();
@@ -147,6 +155,19 @@ const searchPosts = async (req, res) => {
   }
 };
 
+// % Get category form Post
+
+// Route to get all distinct categories from posts
+const categories = async (req, res) => {
+  try {
+    const categories = await Post.distinct('category'); // Fetch distinct categories
+    res.json(categories);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch categories' });
+  }
+};
+
 module.exports = {
   createPost,
   getPost,
@@ -154,4 +175,5 @@ module.exports = {
   updatePost,
   deletePost,
   searchPosts,
+  categories,
 };

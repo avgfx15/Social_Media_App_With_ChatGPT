@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { forgotPassword, resetState } from '../features/forgotResetPasswordSlice';
-
+import { forgotPassword } from '../features/Auth/forgotResetPasswordAction';
+import { resetState } from '../features/Auth/forgotResetPasswordSlice';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -26,13 +26,13 @@ const ForgotPassword = () => {
       <h1>Forgot Password</h1>
       <form onSubmit={handleSubmit}>
         <input
-          type="email"
-          placeholder="Enter your email"
+          type='email'
+          placeholder='Enter your email'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <button type="submit" disabled={loading}>
+        <button type='submit' disabled={loading}>
           {loading ? 'Sending...' : 'Submit'}
         </button>
       </form>

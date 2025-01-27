@@ -4,9 +4,11 @@ import CreatePostComponent from './PostComponents/CreatePostComponent';
 
 const Home = () => {
   return (
-    <div>
-      <h2>Welcome to the User Authentication App</h2>
-      <div className='min-h-screen bg-gray-100 flex items-center justify-center'>
+    <div className='container mx-auto'>
+      <h2 className='m-3 font-bold text-3xl'>
+        Welcome to the User Authentication App
+      </h2>
+      <div>
         <CreatePostComponent />
       </div>
     </div>
