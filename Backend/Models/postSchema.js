@@ -18,7 +18,6 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Category is required'],
       trim: true,
-      unique: true,
     },
     content: {
       type: String,

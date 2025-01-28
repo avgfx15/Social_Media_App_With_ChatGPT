@@ -1,7 +1,6 @@
 export const joditConfig = {
   readonly: false,
   height: 400, // Editor height in pixels
-
   placeholder: 'Type your content here...',
   // Other configurations...,
   focus: true,

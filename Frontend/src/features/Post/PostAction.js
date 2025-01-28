@@ -32,6 +32,19 @@ export const createPost = createAsyncThunk(
   }
 );
 
+// % Get All POsts
+export const getAllPosts = createAsyncThunk(
+  'getallpost',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/posts`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 // % Get all categories from post
 export const getCategories = createAsyncThunk(
   'categories/getAll',

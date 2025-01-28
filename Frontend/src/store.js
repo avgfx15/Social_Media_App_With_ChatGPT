@@ -9,7 +9,7 @@ const store = configureStore({
   reducer: {
     authReducer,
     forgotResetPasswordReducer,
-    post: postReducer,
+    postReducer,
     mediaReducer,
   },
 });

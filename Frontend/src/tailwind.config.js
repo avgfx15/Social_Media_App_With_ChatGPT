@@ -1,10 +1,14 @@
 /** @type {import('tailwindcss').Config} */
+import flowbite from 'flowbite-react/tailwind';
+import tailwindScrollbar from 'tailwind-scrollbar';
+
 import colors from 'tailwindcss/colors';
 
 module.exports = {
   content: [
     './src/**/*.{js,jsx,ts,tsx}', // Include all source files
     './public/index.html', // Include your main HTML
+    flowbite.content(),
   ],
   theme: {
     screens: {
@@ -26,5 +30,5 @@ module.exports = {
 
     extend: {},
   },
-  plugins: [],
+  plugins: [flowbite.plugin(), tailwindScrollbar()],
 };

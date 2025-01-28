@@ -7,6 +7,8 @@ import SignUp from './SignUp';
 import ProtectedRoute from './ProtectedRoute';
 import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
+import CreatePostComponent from './PostComponents/CreatePostComponent';
+import Dashboard from './Dashboard';
 
 const RoutesComponent = () => {
   const authToken = localStorage.getItem('token');
@@ -14,14 +16,20 @@ const RoutesComponent = () => {
   return (
     <Routes>
       {/* Protected Route for Home */}
-      <Route
-        path='/'
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
-      />
+      {authToken && (
+        <>
+          <Route
+            path='/createpost'
+            element={
+              <ProtectedRoute>
+                <CreatePostComponent />
+              </ProtectedRoute>
+            }
+          />
+          {/* <Route path='/dashboard' element={<Dashboard />} /> */}
+        </>
+      )}
+      <Route path='/' element={<Home />} />
       <Route path='/forgot-password' element={<ForgotPassword />} />
       <Route path='/reset-password' element={<ResetPassword />} />
       {!authToken && (

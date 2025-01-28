@@ -7,15 +7,19 @@ import { config, joditConfig } from '../../joditConfig';
 import { createPost } from '../../features/Post/PostAction';
 import { uploadImage } from '../../features/Media/MediaAction';
 import { imageUrlState } from '../../features/Media/MediaSlice';
-import { allCategoriesState } from '../../features/Post/PostSlice';
+import {
+  allCategoriesState,
+  getAllPostsState,
+} from '../../features/Post/PostSlice';
 
 const CreatePostComponent = () => {
   const dispatch = useDispatch();
 
-  const allCategories = useSelector(allCategoriesState);
+  const getAllPostsData = useSelector(getAllPostsState);
+
+  const allCategoriesData = useSelector(allCategoriesState);
 
   const [newCategory, setNewCategory] = useState('');
-  const [categories, setCategories] = useSelector(allCategories);
 
   // # Jodit-react Set up
   const editor1 = useRef(null);
@@ -40,6 +44,8 @@ const CreatePostComponent = () => {
   const [category, setCategory] = useState('');
   const [content, setContent] = useState('');
 
+  const [uploadImageUrlStore, setUploadImageUrlStore] = useState(''); // Store uploaded image URL
+
   const uploadImageUrl = useSelector(imageUrlState);
 
   // % Handle Image Upload
@@ -51,7 +57,8 @@ const CreatePostComponent = () => {
   };
 
   // Handle file upload
-  const handleUpload = async () => {
+  const handleUpload = async (e) => {
+    e.preventDefault();
     if (!file) {
       alert('Please select an image before uploading.');
       return;
@@ -76,12 +83,17 @@ const CreatePostComponent = () => {
     console.log('Publishing Post: ', post);
 
     dispatch(createPost(post));
+    setTitle('');
+    setSubTitle('');
+    setCategory('');
+    setContent('');
+    setFile(null);
   };
 
   return (
-    <div className='flex flex-col flex-wrap lg:flex-row gap-6 px-8 py-4'>
+    <div className='flex flex-col lg:flex-row md:flex-worp gap-6 px-8 py-4 mb-3'>
       {/* Input Fields Panel */}
-      <div className='w-full lg:w-1/2 border rounded-lg p-6 bg-gray-100 dark:bg-gray-800'>
+      <div className='w-full border rounded-lg p-6 bg-gray-300 dark:bg-gray-800'>
         <h2 className='text-2xl font-bold mb-4'>Create Post</h2>
 
         {/* Title */}
@@ -98,7 +110,7 @@ const CreatePostComponent = () => {
             value={title}
             onBlur={removePoweredBy} // Triggered when the editor loads
             onChange={(newContent) => setTitle(newContent)} // Triggered when the user types something
-            className='text-gray-900'
+            className='text-gray-900 bg-red-400'
           />
         </div>
         {/* Subtitle */}
@@ -119,27 +131,8 @@ const CreatePostComponent = () => {
           />
         </div>
         {/* Category */}
-        {/* <div className='my-2 p-2 border-1 border-gray-500 rounded-md'>
-          <label
-            htmlFor='category'
-            className='block text-xl text-green-600 font-extrabold dark:text-green-400'
-          >
-            Category
-          </label>
-          <select
-            id='category'
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className='mt-1 mb-4 w-full border-gray-300 rounded-md text-gray-900'
-          >
-            <option value=''>Select Category</option>
-            <option value='Technology'>Technology</option>
-            <option value='Health'>Health</option>
-            <option value='Lifestyle'>Lifestyle</option>
-          </select>
-        </div> */}
 
-        <div className='my-2 p-2 border border-gray-500 rounded-md'>
+        <div className='my-2 p-2 border-1 border-gray-500 rounded-md'>
           <label
             htmlFor='category'
             className='block text-xl text-green-600 font-extrabold dark:text-green-400'
@@ -155,8 +148,8 @@ const CreatePostComponent = () => {
             className='mt-1 mb-4 w-full border-gray-300 rounded-md text-gray-900'
           >
             <option value=''>Select Category</option>
-            {categories.map((cat, index) => (
-              <option key={index} value={cat}>
+            {allCategoriesData.map((cat, ind) => (
+              <option key={ind} value={cat}>
                 {cat}
               </option>
             ))}
@@ -183,8 +176,7 @@ const CreatePostComponent = () => {
               <button
                 type='button'
                 onClick={() => {
-                  if (newCategory && !categories.includes(newCategory)) {
-                    setCategories([...categories, newCategory]);
+                  if (newCategory && !allCategoriesData.includes(newCategory)) {
                     setCategory(newCategory);
                     setNewCategory('');
                   } else {
@@ -213,7 +205,6 @@ const CreatePostComponent = () => {
               config={joditConfig}
               value={content}
               onBlur={(newContent) => setContent(newContent)}
-              className='text-gray-900'
             />
           </div>
         </div>

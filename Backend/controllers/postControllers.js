@@ -6,7 +6,6 @@ const createPost = async (req, res) => {
   try {
     const { title, subTitle, category, content, media } = req.body;
     const author = req.user.id; // Assuming `req.user` is populated via middleware
-    console.log(req.body);
 
     // Validate required fields
     if (!title || !subTitle || !category || !content) {
@@ -85,7 +84,7 @@ const getAllPosts = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
-    res.status(200).json(posts);
+    res.status(200).json({ allPosts: posts });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
