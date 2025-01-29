@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "install": "(cd backend && npm install) && (cd frontend && npm install)",
-    "build": "(cd frontend && npm run build) && (cd backend && npm run build || true)",
-    "start": "node backend/server.js"
+    "install": "(cd Backend && npm install) && (cd Frontend && npm install)",
+    "build": "(cd Frontend && npm run build) && (cd Backend && npm run build || true)",
+    "start": "node Backend/server.js"
   }
 }
