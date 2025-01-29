@@ -54,6 +54,10 @@ app.post('/api/uploads', upload.single('image'), (req, res) => {
     .json({ message: 'Image uploaded successfully', url: filePath });
 });
 
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
+});
+
 // Default route
 app.get('/', (req, res) => {
   res.send('API is running...');
