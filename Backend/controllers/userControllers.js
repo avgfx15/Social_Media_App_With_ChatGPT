@@ -75,11 +75,15 @@ const signin = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRATION || '1h' } // Default expiration: 1 hour
     );
-
+    const userData = {
+      _id: user._id,
+      email: user.email,
+    };
     // Send the token to the response
     res.status(200).json({
       message: 'Login successful',
       token,
+      userData,
     });
   } catch (error) {
     console.error('Error during signin:', error.message);

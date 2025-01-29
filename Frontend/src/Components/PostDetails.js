@@ -4,12 +4,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getPostById } from '../features/Post/PostAction';
 import { getCurrentPostState } from '../features/Post/PostSlice';
 import RichTextViewer from './RichTextViewer';
+import { addLike, removeLike } from '../features/Likes/likeAction';
+import { loggedInUserState } from '../features/Auth/authSlice';
+import { likesState } from '../features/Likes/LikeSlice';
 
 const PostDetails = () => {
   const dispatch = useDispatch();
   const { postId } = useParams();
 
   const currentPost = useSelector(getCurrentPostState);
+  const loggedInUser = useSelector(loggedInUserState);
+  const allLikes = useSelector(likesState);
+  console.log(allLikes);
 
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
@@ -19,46 +25,32 @@ const PostDetails = () => {
     dispatch(getPostById(postId));
   }, [dispatch, postId]);
 
-  //   const loadComments = async () => {
-  //     try {
-  //       const commentData = await fetchComments(postId);
-  //       setComments(commentData);
-  //     } catch (error) {
-  //       console.error('Error fetching comments:', error);
-  //     }
-  //   };
-
-  //   loadPost();
-  //   loadComments();
-  // }, [postId]);
+  useEffect(() => {
+    if (currentPost) {
+      setPost(currentPost);
+    }
+  }, [currentPost]);
 
   const handleLikePost = async () => {
-    // try {
-    //   await likePost(postId);
-    //   setPost({ ...post, likes: post.likes + 1 });
-    // } catch (error) {
-    //   console.error('Error liking post:', error);
-    // }
+    await dispatch(addLike(postId));
+    dispatch(getPostById(postId)); // Refetch post data
+  };
+
+  const handleUnLikePost = async () => {
+    await dispatch(removeLike(postId));
+    dispatch(getPostById(postId)); // Refetch post data
   };
 
   const handleLikeComment = async (commentId) => {
-    // try {
-    //   await likeComment(commentId);
-    //   setComments((prevComments) =>
-    //     prevComments.map((comment) =>
-    //       comment.id === commentId
-    //         ? { ...comment, likes: comment.likes + 1 }
-    //         : comment
-    //     )
-    //   );
-    // } catch (error) {
-    //   console.error('Error liking comment:', error);
-    // }
+    // Implement like comment functionality
   };
 
   if (!currentPost) {
     return <div>Loading...</div>;
   }
+
+  const hasLiked = currentPost?.likes?.includes(loggedInUser?._id);
+  console.log(hasLiked);
 
   return (
     <div className='container mx-auto p-6'>
@@ -86,9 +78,27 @@ const PostDetails = () => {
             <RichTextViewer content={currentPost?.content} />
           </div>
           <div className='flex items-center space-x-4'>
-            <button onClick={handleLikePost}>
-              Like ({currentPost?.likes})
-            </button>
+            {hasLiked ? (
+              <button
+                onClick={handleUnLikePost}
+                disabled={!currentPost}
+                type='button'
+                className='py-1 px-2 bg-red-600'
+              >
+                Unlike
+              </button>
+            ) : (
+              <button
+                onClick={handleLikePost}
+                disabled={!currentPost}
+                type='button'
+                className='py-1 px-2 bg-blue-600'
+              >
+                Like
+              </button>
+            )}
+            <p>Likes: {currentPost?.likes?.length}</p>
+            {/* Render comments and other post details */}
           </div>
         </div>
       </div>

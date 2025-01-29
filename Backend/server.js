@@ -8,6 +8,8 @@ const dbConnect = require('./DB/dbConnect');
 const protectedRouter = require('./routes/protectedRoutes');
 const postRoutes = require('./routes/postRoutes');
 const { upload } = require('./Middleware/multer');
+const likeRouter = require('./routes/likeRoutes');
+const commentRouter = require('./routes/commentRouters');
 
 dotenv.config(); // Load environment variables
 
@@ -36,6 +38,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/', protectedRouter);
+// Other routes
+app.use('/api', likeRouter);
+
+app.use('/api', commentRouter);
 
 // API endpoint to handle image upload
 app.post('/api/uploads', upload.single('image'), (req, res) => {
