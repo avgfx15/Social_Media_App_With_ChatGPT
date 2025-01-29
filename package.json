@@ -3,5 +3,8 @@
     "install": "(cd Backend && npm install) && (cd Frontend && npm install)",
     "build": "(cd Frontend && npm run build) && (cd Backend && npm run build || true)",
     "start": "node Backend/server.js"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }
