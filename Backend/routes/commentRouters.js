@@ -7,19 +7,31 @@ const {
   addLike,
   removeLike,
 } = require('../controllers/commentControllers');
-const { protect } = require('../Middleware/authMiddleware');
+const authenticateToken = require('../Middleware/authMiddleware');
 
 const commentRouter = express.Router();
 
 commentRouter.post(
   '/posts/:postId/comments',
-  protect,
+  authenticateToken,
   createCommentByPostIdByUser
 );
 commentRouter.get('/posts/:postId/comments', getAllCommentsByPostId);
-commentRouter.put('/comments/:commentId', protect, updateCommentByAuthor);
-commentRouter.delete('/comments/:commentId', protect, deleteCommentByAuthor);
-commentRouter.post('/comments/:commentId/like', protect, addLike);
-commentRouter.delete('/comments/:commentId/like', protect, removeLike);
+commentRouter.put(
+  '/comments/:commentId',
+  authenticateToken,
+  updateCommentByAuthor
+);
+commentRouter.delete(
+  '/comments/:commentId',
+  authenticateToken,
+  deleteCommentByAuthor
+);
+commentRouter.post('/comments/:commentId/like', authenticateToken, addLike);
+commentRouter.delete(
+  '/comments/:commentId/like',
+  authenticateToken,
+  removeLike
+);
 
 module.exports = commentRouter;

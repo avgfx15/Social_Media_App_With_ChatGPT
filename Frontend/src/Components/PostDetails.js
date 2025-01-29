@@ -7,6 +7,17 @@ import RichTextViewer from './RichTextViewer';
 import { addLike, removeLike } from '../features/Likes/likeAction';
 import { loggedInUserState } from '../features/Auth/authSlice';
 import { likesState } from '../features/Likes/LikeSlice';
+import {
+  createComment,
+  deleteComment,
+  likeComment,
+  unlikeComment,
+  updateComment,
+} from '../features/Comments/commentAction';
+import {
+  commentsState,
+  getCommentByPostIdState,
+} from '../features/Comments/CommentSlice';
 
 const PostDetails = () => {
   const dispatch = useDispatch();
@@ -14,11 +25,18 @@ const PostDetails = () => {
 
   const currentPost = useSelector(getCurrentPostState);
   const loggedInUser = useSelector(loggedInUserState);
+  console.log(loggedInUser);
+
   const allLikes = useSelector(likesState);
-  console.log(allLikes);
+
+  const comments = useSelector(commentsState);
+  const getCommentByPostId = useSelector(getCommentByPostIdState);
+  console.log(getCommentByPostId);
 
   const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
+  const [commentContent, setCommentContent] = useState('');
+  const [editCommentContent, setEditCommentContent] = useState('');
+  const [editCommentId, setEditCommentId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,8 +59,29 @@ const PostDetails = () => {
     dispatch(getPostById(postId)); // Refetch post data
   };
 
+  const handleCreateComment = async () => {
+    dispatch(createComment({ postId, content: commentContent }));
+    setCommentContent('');
+  };
+
+  const handleUpdateComment = async () => {
+    dispatch(
+      updateComment({ commentId: editCommentId, content: editCommentContent })
+    );
+    setEditCommentId(null);
+    setEditCommentContent('');
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    dispatch(deleteComment(commentId));
+  };
+
   const handleLikeComment = async (commentId) => {
-    // Implement like comment functionality
+    dispatch(likeComment(commentId));
+  };
+
+  const handleUnlikeComment = async (commentId) => {
+    dispatch(unlikeComment(commentId));
   };
 
   if (!currentPost) {
@@ -105,23 +144,70 @@ const PostDetails = () => {
 
       <section className='comments-section'>
         <h3 className='text-2xl font-semibold mb-4'>Comments</h3>
-        {comments.length === 0 ? (
+        {loggedInUser && (
+          <div className='mb-4'>
+            <textarea
+              value={commentContent}
+              onChange={(e) => setCommentContent(e.target.value)}
+              placeholder='Add a comment...'
+              className='w-full p-2 border rounded'
+            />
+            <button
+              onClick={handleCreateComment}
+              className='mt-2 py-1 px-4 bg-blue-600 text-white rounded'
+            >
+              Comment
+            </button>
+          </div>
+        )}
+        {getCommentByPostId.length === 0 ? (
           <p className='text-gray-500'>
             No comments yet. Be the first to comment!
           </p>
         ) : (
-          comments.map((comment) => (
+          getCommentByPostId.map((comment) => (
             <div
-              key={comment.id}
+              key={comment._id}
               className='rounded-2xl shadow-md p-4 mb-4 bg-gray-50'
             >
               <p className='text-gray-800 mb-2'>{comment.content}</p>
               <div className='text-sm text-gray-400 mb-4'>
-                By: {comment.author}
+                By: {comment.author.email}
               </div>
-              <button size='sm' onClick={() => handleLikeComment(comment.id)}>
-                Like ({comment.likes})
-              </button>
+              {comment.author?._id === loggedInUser?._id && (
+                <div className='flex space-x-2'>
+                  <button
+                    onClick={() => {
+                      setEditCommentId(comment?._id);
+                      handleUpdateComment();
+                    }}
+                    className='py-1 px-2 bg-yellow-500 text-white rounded'
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteComment(comment?._id)}
+                    className='py-1 px-2 bg-red-600 text-white rounded'
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+              {comment.likes.includes(loggedInUser?._id) ? (
+                <button
+                  onClick={() => handleUnlikeComment(comment?._id)}
+                  className='py-1 px-2 bg-red-600 text-white rounded'
+                >
+                  Unlike ({comment.likes.length})
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleLikeComment(comment?._id)}
+                  className='py-1 px-2 bg-blue-600 text-white rounded'
+                >
+                  Like ({comment.likes.length})
+                </button>
+              )}
             </div>
           ))
         )}

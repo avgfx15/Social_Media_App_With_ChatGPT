@@ -5,6 +5,7 @@ import { mediaReducer } from './features/Media/MediaSlice';
 import { forgotResetPasswordReducer } from './features/Auth/forgotResetPasswordSlice';
 import { authReducer } from './features/Auth/authSlice';
 import { likeReducer } from './features/Likes/LikeSlice';
+import { commentReducer } from './features/Comments/CommentSlice';
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     postReducer,
     mediaReducer,
     likeReducer,
+    commentReducer,
   },
 });
 

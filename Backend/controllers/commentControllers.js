@@ -1,11 +1,17 @@
 const Comment = require('../Models/commentSchema');
+const { findById } = require('../Models/likeSchema');
 const Post = require('../Models/postSchema');
 
-exports.createCommentByPostIdByUser = async (req, res) => {
+const createCommentByPostIdByUser = async (req, res) => {
   try {
     const { content, parentComment } = req.body;
     const { postId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
 
     const newComment = new Comment({
       content,
@@ -16,17 +22,25 @@ exports.createCommentByPostIdByUser = async (req, res) => {
 
     const savedComment = await newComment.save();
 
-    await Post.findByIdAndUpdate(postId, {
-      $push: { comments: savedComment._id },
-    });
+    post.comments.push(savedComment._id);
+    await post.save();
 
-    res.status(201).json(savedComment);
+    const allCommentByPostId = await Comment.find({ post: postId }).populate(
+      'author',
+      'email'
+    );
+
+    const getPostById = await Post.findById({ _id: postId });
+
+    res
+      .status(201)
+      .json({ newComment: savedComment, allCommentByPostId, getPostById });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
 };
 
-exports.getAllCommentsByPostId = async (req, res) => {
+const getAllCommentsByPostId = async (req, res) => {
   try {
     const { postId } = req.params;
     const comments = await Comment.find({ post: postId })
@@ -38,7 +52,7 @@ exports.getAllCommentsByPostId = async (req, res) => {
   }
 };
 
-exports.updateCommentByAuthor = async (req, res) => {
+const updateCommentByAuthor = async (req, res) => {
   try {
     const { commentId } = req.params;
     const { content } = req.body;
@@ -62,7 +76,7 @@ exports.updateCommentByAuthor = async (req, res) => {
   }
 };
 
-exports.deleteCommentByAuthor = async (req, res) => {
+const deleteCommentByAuthor = async (req, res) => {
   try {
     const { commentId } = req.params;
     const userId = req.user._id;
@@ -88,7 +102,7 @@ exports.deleteCommentByAuthor = async (req, res) => {
   }
 };
 
-exports.addLike = async (req, res) => {
+const addLike = async (req, res) => {
   try {
     const { commentId } = req.params;
     const userId = req.user._id;
@@ -113,7 +127,7 @@ exports.addLike = async (req, res) => {
   }
 };
 
-exports.removeLike = async (req, res) => {
+const removeLike = async (req, res) => {
   try {
     const { commentId } = req.params;
     const userId = req.user._id;
@@ -137,4 +151,13 @@ exports.removeLike = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
+};
+
+module.exports = {
+  createCommentByPostIdByUser,
+  getAllCommentsByPostId,
+  updateCommentByAuthor,
+  deleteCommentByAuthor,
+  addLike,
+  removeLike,
 };

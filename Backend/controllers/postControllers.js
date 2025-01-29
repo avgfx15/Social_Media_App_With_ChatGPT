@@ -51,20 +51,24 @@ const getPost = async (req, res) => {
     const { postId } = req.params;
 
     const post = await Post.findById(postId)
-      .populate('author', 'email username avatar') // Populate author data
+      .populate('author', 'email') // Populate author data
+      .populate({
+        path: 'likes', // Populate likes
+        select: 'user', // Select specific fields
+      })
       .populate({
         path: 'comments', // Populate comments
         select: 'content author', // Select specific fields
         populate: {
           // Populate author for each comment
           path: 'author',
-          select: 'email username avatar',
+          select: 'email',
         },
       });
-
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
+    console.log(JSON.stringify(post, null, 2)); // Log the populated post data
 
     res.status(201).json({
       message: 'Get Post successfully',
