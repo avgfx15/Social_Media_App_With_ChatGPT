@@ -2,13 +2,16 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000'; // Replace with your API URL
+
 // Async thunk for user sign-in
 export const signinUser = createAsyncThunk(
   'auth/signinUser',
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/users/signin',
+        `${API_BASE_URL}/api/users/signin`,
         userData
       );
       toast.success('Login successful!');
@@ -29,7 +32,7 @@ export const signupUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/users/signup',
+        `${API_BASE_URL}/api/users/signup`,
         userData
       );
       toast.success('Sign-up successful!');
@@ -47,7 +50,7 @@ export const validateToken = createAsyncThunk(
   'userAuthenticate',
   async (token) => {
     try {
-      const response = await axios.get('http://localhost:5000/', {
+      const response = await axios.get(`${API_BASE_URL}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

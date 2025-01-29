@@ -11,9 +11,6 @@ export const createPost = createAsyncThunk(
   'posts/create',
   async (postData, { rejectWithValue }) => {
     try {
-      console.log(postData.media);
-      console.log(postData);
-
       const response = await axios.post(
         `${API_BASE_URL}/api/posts/`,
         postData,

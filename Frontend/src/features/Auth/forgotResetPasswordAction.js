@@ -1,4 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000'; // Replace with your API URL
 
 // Async thunk for Forgot Password (sending reset email)
 export const forgotPassword = createAsyncThunk(
@@ -6,7 +9,7 @@ export const forgotPassword = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        'http://localhost:5000/api/users/forgot-password',
+        `${API_BASE_URL}/api/users/forgot-password`,
         {
           method: 'POST',
           headers: {
@@ -32,16 +35,13 @@ export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async ({ token, newPassword }, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        'http://localhost:5000/api/users/reset-password',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ token, newPassword }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/users/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, newPassword }),
+      });
 
       const data = await response.json();
       if (!response.ok) {
