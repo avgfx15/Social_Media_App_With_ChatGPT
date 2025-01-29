@@ -68,7 +68,6 @@ const getPost = async (req, res) => {
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
-    console.log(JSON.stringify(post, null, 2)); // Log the populated post data
 
     res.status(201).json({
       message: 'Get Post successfully',
