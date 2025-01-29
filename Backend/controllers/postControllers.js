@@ -66,7 +66,10 @@ const getPost = async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    res.status(200).json(post);
+    res.status(201).json({
+      message: 'Get Post successfully',
+      post,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -79,7 +82,7 @@ const getAllPosts = async (req, res) => {
     const { page = 1, limit = 10 } = req.query; // Pagination query params
 
     const posts = await Post.find()
-      .populate('author', 'username avatar')
+      .populate('author', 'email username avatar')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));

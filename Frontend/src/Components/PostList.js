@@ -21,12 +21,21 @@ const PostList = () => {
             className='w-full h-48 object-cover'
           />
           <div className='p-4'>
-            <RichTextViewer title={post.title} />
-
+            <RichTextViewer content={post.title} />
             <div className='mt-2 text-gray-700'>{post.subTitle}</div>
             <div className='text-sm text-gray-600'>{post.category}</div>
-            <RichTextViewer content={post.content.slice(0, 100)} />
+            <RichTextViewer
+              content={`${post.content.slice(0, 100)}${
+                post.content.length > 100 ? '...' : ''
+              }`}
+            />
 
+            <div className='border-2 border-bottom border-blue-400'>
+              <p>
+                Author : {}
+                <span className='text-red-600'>{post.author.email}</span>
+              </p>
+            </div>
             <button
               onClick={() => navigate(`/post/${post._id}`)}
               className='mt-4 px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700'

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const RichTextViewer = ({ title, content }) => {
+const RichTextViewer = ({ content }) => {
   return (
     <div className='rich-text' dangerouslySetInnerHTML={{ __html: content }} />
   );

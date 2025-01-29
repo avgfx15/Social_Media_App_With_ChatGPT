@@ -7,15 +7,10 @@ import { config, joditConfig } from '../../joditConfig';
 import { createPost } from '../../features/Post/PostAction';
 import { uploadImage } from '../../features/Media/MediaAction';
 import { imageUrlState } from '../../features/Media/MediaSlice';
-import {
-  allCategoriesState,
-  getAllPostsState,
-} from '../../features/Post/PostSlice';
+import { allCategoriesState } from '../../features/Post/PostSlice';
 
 const CreatePostComponent = () => {
   const dispatch = useDispatch();
-
-  const getAllPostsData = useSelector(getAllPostsState);
 
   const allCategoriesData = useSelector(allCategoriesState);
 
@@ -43,8 +38,6 @@ const CreatePostComponent = () => {
   const [subTitle, setSubTitle] = useState('');
   const [category, setCategory] = useState('');
   const [content, setContent] = useState('');
-
-  const [uploadImageUrlStore, setUploadImageUrlStore] = useState(''); // Store uploaded image URL
 
   const uploadImageUrl = useSelector(imageUrlState);
 
@@ -149,7 +142,7 @@ const CreatePostComponent = () => {
           >
             <option value=''>Select Category</option>
             {allCategoriesData.map((cat, ind) => (
-              <option key={ind} value={cat}>
+              <option key={cat} value={cat}>
                 {cat}
               </option>
             ))}

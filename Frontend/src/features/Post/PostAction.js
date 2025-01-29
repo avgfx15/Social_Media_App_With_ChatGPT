@@ -45,6 +45,22 @@ export const getAllPosts = createAsyncThunk(
   }
 );
 
+// % Get Post By Id
+export const getPostById = createAsyncThunk(
+  'getpostbyid',
+  async (postId, { rejectWithValue }) => {
+    console.log(postId);
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/posts/${postId}`);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 // % Get all categories from post
 export const getCategories = createAsyncThunk(
   'categories/getAll',

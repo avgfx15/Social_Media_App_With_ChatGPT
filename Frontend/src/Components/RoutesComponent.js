@@ -9,6 +9,7 @@ import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
 import CreatePostComponent from './PostComponents/CreatePostComponent';
 import Dashboard from './Dashboard';
+import PostDetails from './PostDetails';
 
 const RoutesComponent = () => {
   const authToken = localStorage.getItem('token');
@@ -30,6 +31,7 @@ const RoutesComponent = () => {
         </>
       )}
       <Route path='/' element={<Home />} />
+      <Route path='/post/:postId' element={<PostDetails />} />
       <Route path='/forgot-password' element={<ForgotPassword />} />
       <Route path='/reset-password' element={<ResetPassword />} />
       {!authToken && (
