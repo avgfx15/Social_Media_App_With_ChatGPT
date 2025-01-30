@@ -27,7 +27,6 @@ const PostDetails = () => {
   const getCommentByPostId = useSelector(getCommentByPostIdState);
   console.log(getCommentByPostId);
 
-  const [post, setPost] = useState(null);
   const [commentContent, setCommentContent] = useState('');
   const [editCommentContent, setEditCommentContent] = useState('');
   const [editCommentId, setEditCommentId] = useState(null);
@@ -36,12 +35,6 @@ const PostDetails = () => {
   useEffect(() => {
     dispatch(getPostById(postId));
   }, [dispatch, postId]);
-
-  useEffect(() => {
-    if (currentPost) {
-      setPost(currentPost);
-    }
-  }, [currentPost]);
 
   const handleLikePost = async () => {
     await dispatch(addLike(postId));
