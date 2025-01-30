@@ -16,14 +16,23 @@ dotenv.config(); // Load environment variables
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Use CORS middleware to allow requests from your frontend
-const corsOptions = {
-  origin: 'http://localhost:3000', // Only allow requests from this domain
-  methods: 'GET,POST,PUT,DELETE', // Allow only these methods (optional)
-  allowedHeaders: 'Content-Type, Authorization', // Specify allowed headers (optional)
-};
+const allowedOrigins = [
+  'http://localhost:3000', // Local development
+  'https://stacodevsocialmedia.netlify.app', // Deployed frontend
+];
 
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Connect to MongoDB
 dbConnect();
