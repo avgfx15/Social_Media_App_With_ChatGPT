@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { resetPassword } from '../features/Auth/forgotResetPasswordAction';
 import { resetState } from '../features/Auth/forgotResetPasswordSlice';
 
@@ -13,7 +13,7 @@ const ResetPassword = () => {
   );
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);

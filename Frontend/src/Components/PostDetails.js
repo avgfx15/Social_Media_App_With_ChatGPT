@@ -6,7 +6,7 @@ import { getCurrentPostState } from '../features/Post/PostSlice';
 import RichTextViewer from './RichTextViewer';
 import { addLike, removeLike } from '../features/Likes/likeAction';
 import { loggedInUserState } from '../features/Auth/authSlice';
-import { likesState } from '../features/Likes/LikeSlice';
+
 import {
   createComment,
   deleteComment,
@@ -14,10 +14,7 @@ import {
   unlikeComment,
   updateComment,
 } from '../features/Comments/commentAction';
-import {
-  commentsState,
-  getCommentByPostIdState,
-} from '../features/Comments/CommentSlice';
+import { getCommentByPostIdState } from '../features/Comments/CommentSlice';
 
 const PostDetails = () => {
   const dispatch = useDispatch();
@@ -27,9 +24,6 @@ const PostDetails = () => {
   const loggedInUser = useSelector(loggedInUserState);
   console.log(loggedInUser);
 
-  const allLikes = useSelector(likesState);
-
-  const comments = useSelector(commentsState);
   const getCommentByPostId = useSelector(getCommentByPostIdState);
   console.log(getCommentByPostId);
 

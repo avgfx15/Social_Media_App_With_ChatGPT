@@ -8,7 +8,7 @@ import ProtectedRoute from './ProtectedRoute';
 import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
 import CreatePostComponent from './PostComponents/CreatePostComponent';
-import Dashboard from './Dashboard';
+
 import PostDetails from './PostDetails';
 
 const RoutesComponent = () => {
